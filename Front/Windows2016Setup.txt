@@ -1,0 +1,38 @@
+﻿Set up remote machine
+
+1) Turn off firewall
+	 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+2) Enable remoting
+	Enable-PSRemoting -Force
+
+3) Trust all incoming conections on remote
+	Set-Item wsman:\localhost\client\trustedhosts *
+
+
+4) Restart WinRM
+	Restart-Service WinRM
+
+5) Use tls12
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+6) Start remote session from host.
+	Enter-PSSession -ComputerName 172.17.94.38 -Credential Administrator
+
+6) Install Docker
+	Install-Module DockerMsftProvider -Force
+	Install-Package Docker -ProviderName DockerMsftProvider -Force
+
+	Restart-Computer
+
+	Docker run hello-world:nanoserver
+
+7) Set the host window name
+	$host.ui.RawUI.WindowTitle = "W2016_2"
+
+8) Create a simple Docker registry
+	1) Create a directory on the host to mount to the containrs c:\Data 
+		mkdir c:\registry-data
+
+	2) Run the registry container:
+		docker run -d --restart=always -p 5000:5000 --ip 172.24.202.164 -v c:\registry-data:c:\data sixeyed/registry
